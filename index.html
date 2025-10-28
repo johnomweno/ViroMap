@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%232563eb' d='M50,5C25.2,5,5,25.2,5,50s20.2,45,45,45s45-20.2,45-45S74.8,5,50,5z M50,86.5C30,86.5,13.5,70,13.5,50S30,13.5,50,13.5S86.5,30,86.5,50S70,86.5,50,86.5z'/%3E%3Cpath fill='%232563eb' d='M50,22.5c-15.2,0-27.5,12.3-27.5,27.5S34.8,77.5,50,77.5S77.5,65.2,77.5,50S65.2,22.5,50,22.5z M50,68.5c-10.2,0-18.5-8.3-18.5-18.5S39.8,31.5,50,31.5S68.5,39.8,68.5,50S60.2,68.5,50,68.5z'/%3E%3C/svg%3E">
+
+    <title>ViroMap - A New Standard in Health Travel</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            color: #111827;
+        }
+        .focusable:focus-visible {
+            outline: 3px solid #2563eb;
+            outline-offset: 2px;
+            border-radius: 0.375rem;
+        }
+        .fade-in { animation: fadeIn 0.8s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #hero-bg {
+            background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+        }
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #ffffff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        .loader-dark {
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top: 4px solid #2563eb;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .timeline-month.safe { background-color: #34d399; } /* Emerald-400 */
+        .timeline-month.moderate { background-color: #fbbf24; } /* Amber-400 */
+        .timeline-month.high { background-color: #f87171; } /* Red-400 */
+
+        .nav-link.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+        }
+
+        /* Styles for the new Disease Info Modal */
+        #disease-modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #disease-modal {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg shadow-sm w-full sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="#" data-view="home" class="nav-link flex items-center space-x-3 focusable rounded-md">
+                     <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+                     </svg>
+                    <h1 class="text-2xl font-bold text-slate-800">ViroMap</h1>
+                </a>
+                <nav class="flex items-center space-x-6 h-full">
+                    <a href="#" data-view="home" class="nav-link h-full flex items-center text-slate-600 hover:text-blue-600 font-semibold focusable transition-colors active">Home</a>
+                    <a href="#" data-view="tableau" class="nav-link h-full flex items-center text-slate-600 hover:text-blue-600 font-semibold focusable transition-colors">Interactive Map</a>
+                    <a href="#" data-view="about" class="nav-link h-full flex items-center text-slate-600 hover:text-blue-600 font-semibold focusable transition-colors">About Us</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div id="home-view" class="view-container">
+        <main>
+            <section id="hero-bg" class="relative text-white py-20 md:py-32">
+                <div class="absolute inset-0 bg-black/50"></div>
+                <div class="relative z-10 text-center p-8 max-w-4xl mx-auto">
+                    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight">Travel with Confidence.</h2>
+                    <p class="mt-4 text-lg md:text-xl max-w-3xl mx-auto text-slate-200">
+                        Your specialized guide to the health landscape in Nigeria, Congo, and South Africa. We focus on prominent regional diseases—Malaria, Tuberculosis, and HIV/AIDS—to help you plan safer travel.
+                    </p>
+                    <div class="mt-10 bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-2xl max-w-2xl mx-auto">
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <div class="w-full text-left">
+                                <label for="destination-select" class="block text-sm font-medium text-slate-700 mb-1">Select a destination</label>
+                                <select id="destination-select" class="w-full p-3 border border-slate-300 rounded-lg text-slate-900 text-base focusable">
+                                    <option value="Nigeria">Nigeria</option>
+                                    <option value="Congo">Democratic Republic of Congo</option>
+                                    <option value="South Africa">South Africa</option>
+                                </select>
+                            </div>
+                            <button id="analyze-btn" class="w-full sm:w-auto bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 focusable text-lg transform hover:scale-105 transition-transform flex items-center justify-center space-x-2 shrink-0">
+                                <span>Analyze</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="results-view" class="hidden max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-800">Health & Travel Outlook for <span id="country-name-title"></span></h2>
+                    <p class="mt-2 text-slate-500">Key insights based on 36 months of historical health data.</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                        <h3 class="font-semibold text-slate-800 mb-4 text-lg flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                            12-Month Travel Timeline
+                        </h3>
+                        <div id="timeline-container" class="w-full flex rounded-lg overflow-hidden"></div>
+                        <div class="flex items-center space-x-4 mt-4 text-sm text-slate-500">
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-emerald-400 mr-2"></span>Low Risk</div>
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-amber-400 mr-2"></span>Moderate Risk</div>
+                            <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-red-400 mr-2"></span>High Risk</div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="font-semibold text-slate-800 text-lg flex items-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                Safest Months
+                            </h3>
+                            <p id="best-months-text" class="text-2xl font-bold text-green-600 mt-2"></p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="font-semibold text-slate-800 text-lg flex items-center">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                 Primary Advisory
+                            </h3>
+                            <button id="main-advisory-btn" class="text-left w-full group">
+                                <p id="main-advisory-text" class="text-2xl font-bold text-red-600 group-hover:text-blue-600 transition-colors"></p>
+                                <span class="text-sm text-slate-500 group-hover:text-blue-600 transition-colors">Click to learn more</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md mb-12">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4 flex items-center">
+                        <span class="text-2xl mr-2">✨</span> AI Travel Briefing
+                    </h3>
+                    <div id="ai-briefing-container">
+                        <button id="generate-briefing-btn" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focusable flex items-center justify-center space-x-2">
+                            <span>Generate AI-Powered Travel Advisory</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md mb-12">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                        Traveler's Health Checklist
+                    </h3>
+                    <div id="checklist-container">
+                        <button id="generate-checklist-btn" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focusable flex items-center justify-center space-x-2">
+                            <span>Generate AI-Powered Checklist</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-4 md:mb-0">Explore the Data</h3>
+                        <div class="w-full md:w-1/3">
+                            <label for="disease-filter" class="block text-sm font-medium text-slate-600 mb-1">Filter by Disease</label>
+                            <select id="disease-filter" class="w-full p-2 border border-slate-300 rounded-md focusable">
+                                <option value="All">All Diseases</option>
+                                <option value="Malaria">Malaria</option>
+                                <option value="Tuberculosis">Tuberculosis</option>
+                                <option value="HIV/AIDS">HIV/AIDS</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="h-96 w-full mb-8">
+                        <canvas id="trends-chart"></canvas>
+                    </div>
+                    <div class="border-t border-slate-200 pt-6">
+                         <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                            <span class="text-2xl mr-2">✨</span> Ask AI About These Trends
+                        </h3>
+                        <div class="flex items-center gap-4">
+                            <input type="text" id="ai-question-input" placeholder="e.g., Why is Malaria risk higher in summer?" class="w-full p-3 border border-slate-300 rounded-lg focusable">
+                            <button id="ask-ai-btn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focusable shrink-0">Ask AI</button>
+                        </div>
+                        <div id="ai-answer-container" class="mt-4 text-slate-600 bg-slate-50 p-4 rounded-lg min-h-[50px]">
+                            Your answer will appear here.
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-8">
+                    <p class="text-xs text-slate-500">
+                        Data is simulated for demonstration purposes. In a real-world scenario, this data would be sourced from official bodies like the WHO Global Health Observatory and CDC WONDER databases.
+                        <br>This information is not a substitute for professional medical advice.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="about-view" class="view-container hidden">
+        <section class="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 fade-in">
+            <div class="bg-white p-8 rounded-xl shadow-md">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-800">About ViroMap</h2>
+                    <p class="mt-2 text-slate-500">The team behind the mission to make travel safer.</p>
+                </div>
+                <div class="max-w-3xl mx-auto text-center mb-16">
+                    <h3 class="text-2xl font-semibold text-slate-800 mb-4">Our Mission</h3>
+                    <p class="text-lg text-slate-600">
+                        To empower individuals and organizations with clear, accessible, and data-driven insights into regional health risks. We believe that by making complex health data easy to understand, we can foster safer travel, promote global health awareness, and help people explore the world with confidence.
+                    </p>
+                </div>
+                <div class="max-w-4xl mx-auto mb-16">
+                    <h3 class="text-2xl font-semibold text-center text-slate-800 mb-8">Meet the Team</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="text-center"><img class="w-32 h-32 mx-auto rounded-full bg-slate-200 object-cover" src="https://placehold.co/400x400/E2E8F0/475569?text=MA" alt="Mordecai Arthur"><h4 class="mt-4 text-lg font-semibold text-slate-800">Mordecai Arthur</h4></div>
+                        <div class="text-center"><img class="w-32 h-32 mx-auto rounded-full bg-slate-200 object-cover" src="https://placehold.co/400x400/E2E8F0/475569?text=JO" alt="John Omweno"><h4 class="mt-4 text-lg font-semibold text-slate-800">John Omweno</h4></div>
+                        <div class="text-center"><img class="w-32 h-32 mx-auto rounded-full bg-slate-200 object-cover" src="https://placehold.co/400x400/E2E8F0/475569?text=DK" alt="Donnel Kongolo"><h4 class="mt-4 text-lg font-semibold text-slate-800">Donnel Kongolo</h4></div>
+                        <div class="text-center"><img class="w-32 h-32 mx-auto rounded-full bg-slate-200 object-cover" src="https://placehold.co/400x400/E2E8F0/475569?text=SM" alt="Shadrach Morris"><h4 class="mt-4 text-lg font-semibold text-slate-800">Shadrach Morris</h4></div>
+                    </div>
+                </div>
+                <div class="max-w-3xl mx-auto mb-16">
+                     <h3 class="text-2xl font-semibold text-center text-slate-800 mb-8">Frequently Asked Questions</h3>
+                     <div class="space-y-6">
+                        <div>
+                            <h4 class="font-semibold text-slate-800">How is the travel risk level calculated?</h4>
+                            <p class="text-slate-600 mt-1">The risk level for each month is determined by analyzing the total historical case counts for Malaria, Tuberculosis, and HIV/AIDS over the past three years. Months with lower combined case counts are deemed safer, providing a simple, data-driven guide for travel planning.</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-800">Is the AI advice a substitute for consulting a doctor?</h4>
+                            <p class="text-slate-600 mt-1">No. The AI-powered advisories are for informational purposes only and are generated based on historical data trends. They are not a substitute for professional medical advice. Always consult with a healthcare provider or a travel clinic before making any travel decisions.</p>
+                        </div>
+                         <div>
+                            <h4 class="font-semibold text-slate-800">Why does the platform only focus on these three countries and diseases?</h4>
+                            <p class="text-slate-600 mt-1">As a specialized prototype, ViroMap focuses on Nigeria, Congo, and South Africa and their most prominent diseases to demonstrate the platform's core capabilities. This targeted approach allows us to provide deep, relevant insights for these specific regions, with the goal of expanding in the future.</p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="tableau-view" class="view-container hidden">
+        <section class="max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 fade-in">
+            <div class="bg-white p-8 rounded-xl shadow-md">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-slate-800">Interactive Disease Map</h2>
+                    <p class="mt-2 text-slate-500">An interactive overview of regional health data.</p>
+                </div>
+                <div class="w-full" style="height: 795px;">
+                    <iframe 
+                        src="https://public.tableau.com/shared/7ZKCNPQRM?:embed=y&:display_count=no&:showVizHome=no" 
+                        frameborder="0" 
+                        style="width: 100%; height: 100%; border: none;">
+                    </iframe>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="privacy-view" class="view-container hidden">
+        <section class="max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 fade-in">
+            <div class="bg-white p-8 rounded-xl shadow-md prose">
+                <h2>Privacy Policy</h2>
+                <p><strong>Last Updated: October 26, 2025</strong></p>
+                <p>ViroMap ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our application. We do not collect any personal data as this is a demonstration application.</p>
+                <h3>Information We Collect</h3>
+                <p>We may collect information about you in a variety of ways. The information we may collect on the Site includes:</p>
+                <ul>
+                    <li><strong>Usage Data:</strong> We may automatically collect usage data (such as IP address, browser type, pages visited) to improve our services. This data is anonymized and cannot be used to identify you.</li>
+                    <li><strong>Country Selections:</strong> We may anonymously track which countries are analyzed to understand user interests and improve our focus.</li>
+                </ul>
+                <h3>Use of Your Information</h3>
+                <p>Having accurate information permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to analyze usage and trends to improve our application and user experience.</p>
+                 <button class="nav-link text-blue-600 hover:underline" data-view="home">← Back to Home</button>
+            </div>
+        </section>
+    </div>
+
+    <div id="terms-view" class="view-container hidden">
+         <section class="max-w-4xl w-full mx-auto p-4 sm:p-6 lg:p-8 fade-in">
+            <div class="bg-white p-8 rounded-xl shadow-md prose">
+                <h2>Terms of Service</h2>
+                <p><strong>Effective Date: October 26, 2025</strong></p>
+                <p>Please read these Terms of Service ("Terms") carefully before using the ViroMap application (the "Service") operated by our team.</p>
+                <h3>1. Acceptance of Terms</h3>
+                <p>By accessing or using the Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.</p>
+                <h3>2. Informational Purposes Only</h3>
+                <p>The Service, including all data, charts, and AI-generated advisories, is provided for informational purposes only. The information provided is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition or travel plans.</p>
+                <h3>3. Intellectual Property</h3>
+                <p>The Service and its original content, features, and functionality are and will remain the exclusive property of the ViroMap team. The underlying data is simulated for demonstration purposes.</p>
+                 <button class="nav-link text-blue-600 hover:underline" data-view="home">← Back to Home</button>
+            </div>
+        </section>
+    </div>
+
+    <div id="disease-modal-overlay" class="fixed inset-0 bg-black/60 z-50 hidden opacity-0"></div>
+    <div id="disease-modal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11/12 max-w-2xl bg-white rounded-xl shadow-2xl p-6 z-50 hidden opacity-0 scale-95">
+        <div class="flex items-center justify-between mb-4">
+            <h2 id="disease-modal-title" class="text-2xl font-bold text-slate-800"></h2>
+            <button id="close-modal-btn" class="text-slate-400 hover:text-slate-800 focusable rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+        <div id="disease-modal-content" class="text-slate-600 space-y-4"></div>
+    </div>
+
+
+    <footer class="bg-slate-800 text-slate-300">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                         <svg class="h-8 w-8 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+                         </svg>
+                        <h1 class="text-2xl font-bold text-white">ViroMap</h1>
+                    </div>
+                    <p class="text-sm text-slate-400">Travel with confidence. Data-driven health insights for your journey.</p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Navigation</h3>
+                    <ul class="mt-4 space-y-2">
+                        <li><a href="#" data-view="home" class="nav-link text-slate-300 hover:text-white transition-colors">Home</a></li>
+                        <li><a href="#" data-view="tableau" class="nav-link text-slate-300 hover:text-white transition-colors">Interactive Map</a></li>
+                        <li><a href="#" data-view="about" class="nav-link text-slate-300 hover:text-white transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                     <h3 class="text-sm font-semibold tracking-wider uppercase text-slate-400">Legal & Contact</h3>
+                     <ul class="mt-4 space-y-2">
+                        <li><a href="#" data-view="privacy" class="nav-link text-slate-300 hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" data-view="terms" class="nav-link text-slate-300 hover:text-white transition-colors">Terms of Service</a></li>
+                        <li><a href="mailto:contact@viromap.dev" class="text-slate-300 hover:text-white transition-colors">contact@viromap.dev</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-slate-700 pt-8 text-center text-sm text-slate-400">
+                <p>&copy; 2025 ViroMap. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let currentAnalysisData = {};
+        const mockData = [];
+        const countries = ['Nigeria', 'Congo', 'South Africa'];
+        const diseases = ['Malaria', 'Tuberculosis', 'HIV/AIDS'];
+        const today = new Date();
+        for (let i = 35; i >= 0; i--) {
+            const date = new Date(today.getFullYear(), today.getMonth() - i, 15);
+            countries.forEach(country => {
+                diseases.forEach(disease => {
+                    let cases = Math.floor(Math.random() * 4000) + 500;
+                    const month = date.getMonth();
+                    if (disease === 'Malaria') {
+                        if (country === 'Nigeria' && (month >= 3 && month <= 10)) cases *= 2.8;
+                        if (country === 'Congo' && (month >= 2 && month <= 10)) cases *= 3.0;
+                        if (country === 'South Africa' && (month >= 10 || month <= 3)) cases *= 2.2;
+                    }
+                    if (disease === 'Tuberculosis') cases *= (1 + Math.random() * 0.5);
+                    mockData.push({ date: date.toISOString().split('T')[0], country, disease, cases: Math.round(cases) });
+                });
+            });
+        }
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        const destinationSelect = document.getElementById('destination-select');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const viewContainers = document.querySelectorAll('.view-container');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const resultsView = document.getElementById('results-view');
+        const countryNameTitle = document.getElementById('country-name-title');
+        const timelineContainer = document.getElementById('timeline-container');
+        const bestMonthsText = document.getElementById('best-months-text');
+        const mainAdvisoryBtn = document.getElementById('main-advisory-btn');
+        const mainAdvisoryText = document.getElementById('main-advisory-text');
+        const diseaseFilter = document.getElementById('disease-filter');
+        const trendsChartCanvas = document.getElementById('trends-chart').getContext('2d');
+        const aiBriefingContainer = document.getElementById('ai-briefing-container');
+        const aiQuestionInput = document.getElementById('ai-question-input');
+        const askAiBtn = document.getElementById('ask-ai-btn');
+        const aiAnswerContainer = document.getElementById('ai-answer-container');
+        const checklistContainer = document.getElementById('checklist-container');
+        const diseaseModalOverlay = document.getElementById('disease-modal-overlay');
+        const diseaseModal = document.getElementById('disease-modal');
+        const diseaseModalTitle = document.getElementById('disease-modal-title');
+        const diseaseModalContent = document.getElementById('disease-modal-content');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        let trendsChart = null;
+
+        // ==================================================================
+        //
+        //  REPLACE your old 'callGeminiAPI' function with this new one.
+        //  Notice the API key and Google URL are GONE.
+        //
+        // ==================================================================
+        async function callGeminiAPI(prompt) {
+            // This now calls YOUR backend function, not Google's.
+            const apiUrl = '/api/gemini'; 
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Send the prompt in the 'body'
+                    body: JSON.stringify({ prompt: prompt }) 
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `API call failed: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Our backend will send back an object like { text: "..." }
+                return result.text || "Sorry, I couldn't generate a response.";
+
+            } catch (error) {
+                console.error("API Error:", error);
+                // Display a more user-friendly error
+                return `An error occurred while contacting the AI. Please check the following:\n1. Ensure your site is deployed correctly (e.g., on Vercel).\n2. Check the serverless function logs in your Vercel dashboard for errors.\n(Details: ${error.message})`;
+            }
+        }
+        // ==================================================================
+        const runAnalysis = () => {
+            const selectedCountry = destinationSelect.value;
+            analyzeBtn.innerHTML = `<div class="loader"></div>`;
+            analyzeBtn.disabled = true;
+
+            setTimeout(() => {
+                const countryData = mockData.filter(d => d.country === selectedCountry);
+                const monthlyRisk = Array(12).fill(0).map((_, i) => ({ month: i, riskScore: countryData.filter(d => new Date(d.date).getMonth() === i).reduce((sum, item) => sum + item.cases, 0) / 3 }));
+                const sortedMonths = [...monthlyRisk].sort((a, b) => a.riskScore - b.riskScore);
+                const lowestRisk = sortedMonths[0].riskScore;
+                const highestRisk = sortedMonths[sortedMonths.length - 1].riskScore;
+                monthlyRisk.forEach(m => {
+                    const p = (highestRisk - lowestRisk === 0) ? 0 : (m.riskScore - lowestRisk) / (highestRisk - lowestRisk);
+                    if (p < 0.33) m.level = 'safe'; else if (p < 0.66) m.level = 'moderate'; else m.level = 'high';
+                });
+                const highestRiskDisease = Object.entries(countryData.reduce((acc, curr) => { acc[curr.disease] = (acc[curr.disease] || 0) + curr.cases; return acc; }, {})).sort((a, b) => b[1] - a[1])[0][0];
+                
+                currentAnalysisData = { country: selectedCountry, riskData: monthlyRisk, primaryDisease: highestRiskDisease };
+                
+                countryNameTitle.textContent = selectedCountry;
+                renderTimeline(monthlyRisk);
+                renderInsights(monthlyRisk, highestRiskDisease);
+                renderChart(countryData);
+
+                aiBriefingContainer.innerHTML = `<button id="generate-briefing-btn" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focusable flex items-center justify-center space-x-2"><span>Generate AI-Powered Travel Advisory</span></button>`;
+                document.getElementById('generate-briefing-btn').addEventListener('click', generateAIBriefing);
+                
+                checklistContainer.innerHTML = `<button id="generate-checklist-btn" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 focusable flex items-center justify-center space-x-2"><span>Generate AI-Powered Checklist</span></button>`;
+                document.getElementById('generate-checklist-btn').addEventListener('click', generateChecklist);
+
+                aiAnswerContainer.textContent = "Your answer will appear here.";
+
+                resultsView.classList.remove('hidden');
+                resultsView.classList.add('fade-in');
+                resultsView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                analyzeBtn.innerHTML = `<span>Analyze</span>`;
+                analyzeBtn.disabled = false;
+            }, 1000);
+        };
+
+        const renderTimeline = (monthlyRisk) => {
+            timelineContainer.innerHTML = monthlyRisk.map(m => `<div class="timeline-month ${m.level} flex-1 text-center text-white font-semibold py-2 text-sm" title="${monthNames[m.month]} - Risk: ${m.level}">${monthNames[m.month][0]}</div>`).join('');
+        };
+        const renderInsights = (monthlyRisk, advisory) => {
+            const bestMonths = monthlyRisk.filter(m => m.level === 'safe').map(m => monthNames[m.month]);
+            bestMonthsText.textContent = bestMonths.length > 0 ? bestMonths.join(', ') : 'None';
+            mainAdvisoryText.textContent = advisory;
+        };
+        const renderChart = (data) => {
+            if (trendsChart) trendsChart.destroy();
+            const labels = [...new Set(mockData.map(d => d.date.substring(0, 7)))].sort();
+            const chartData = labels.map(label => data.filter(d => d.date.startsWith(label)).reduce((sum, d) => sum + d.cases, 0));
+            trendsChart = new Chart(trendsChartCanvas, { type: 'line', data: { labels: labels.map(l => new Date(l).toLocaleDateString('en-us',{ month:'short', year:'2-digit' })), datasets: [{ label: 'Total Reported Cases', data: chartData, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4, pointRadius: 2, pointBackgroundColor: '#2563eb' }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } } });
+        };
+        const updateChartForFilter = () => {
+            if (!currentAnalysisData.country) return;
+            const { country } = currentAnalysisData;
+            const selectedDisease = diseaseFilter.value;
+            let filteredData = mockData.filter(d => d.country === country);
+            if(selectedDisease !== 'All') filteredData = filteredData.filter(d => d.disease === selectedDisease);
+            renderChart(filteredData);
+        };
+
+        async function generateAIBriefing() {
+            aiBriefingContainer.innerHTML = `<div class="flex items-center justify-center text-slate-600"><div class="loader loader-dark mr-3"></div>Generating your personalized advisory...</div>`;
+            const { country, riskData, primaryDisease } = currentAnalysisData;
+            const riskString = riskData.map(m => `${monthNames[m.month]}: ${m.level}`).join(', ');
+            const prompt = `You are a travel health advisor. For a trip to ${country}, where seasonal risk is ${riskString} and the primary disease is ${primaryDisease}, generate a concise, friendly, one-paragraph travel advisory. Mention safest months and practical prevention tips. Do not use markdown.`;
+            const response = await callGeminiAPI(prompt);
+            aiBriefingContainer.innerHTML = `<p class="text-slate-700 bg-slate-50 p-4 rounded-lg">${response.replace(/\n/g, '<br>')}</p>`;
+        }
+
+        async function generateChecklist() {
+            checklistContainer.innerHTML = `<div class="flex items-center justify-center text-slate-600"><div class="loader loader-dark mr-3"></div>Building your checklist...</div>`;
+            const { country, primaryDisease } = currentAnalysisData;
+            const prompt = `You are a travel health expert. Generate a practical travel health checklist for a trip to ${country}, where the primary disease concern is ${primaryDisease}. Format the response with clear headings using double asterisks (e.g., **Before You Go:**). Use hyphens (-) for bullet points. Be concise and actionable.`;
+            let response = await callGeminiAPI(prompt);
+            
+            response = response
+                .replace(/\*\*(.*?)\*\*/g, '<h4 class="font-semibold text-slate-800 mt-4 mb-2">$1</h4>')
+                .replace(/-\s(.*?)(?=\n-|\n\n|$)/g, '<li class="ml-5">$1</li>')
+                .replace(/\n/g, ''); // Remove extra newlines
+            
+            checklistContainer.innerHTML = `<ul class="list-disc space-y-2 text-slate-700">${response}</ul>`;
+        }
+        
+        async function getDiseaseInfo() {
+            const diseaseName = currentAnalysisData.primaryDisease;
+            diseaseModalTitle.textContent = diseaseName;
+            diseaseModalContent.innerHTML = `<div class="flex items-center justify-center text-slate-600"><div class="loader loader-dark mr-3"></div>Loading information...</div>`;
+            
+            const prompt = `You are a public health communicator. Provide a concise, easy-to-understand overview for a traveler about ${diseaseName}. Cover three sections with headings using double asterisks: **How it Spreads:**, **Common Symptoms:**, and **Key Prevention Methods:**. Use simple language. Do not use markdown for lists.`;
+            let response = await callGeminiAPI(prompt);
+
+            response = response.replace(/\*\*(.*?)\*\*/g, '<h4 class="font-semibold text-slate-800 mt-3 mb-1">$1</h4>');
+
+            diseaseModalContent.innerHTML = `<div class="prose max-w-none">${response.replace(/\n/g, '<br>')}</div>`;
+        }
+
+        function showModal() {
+            diseaseModalOverlay.classList.remove('hidden');
+            diseaseModal.classList.remove('hidden');
+            setTimeout(() => {
+                diseaseModalOverlay.classList.remove('opacity-0');
+                diseaseModal.classList.remove('opacity-0', 'scale-95');
+            }, 10);
+            getDiseaseInfo();
+        }
+
+        function hideModal() {
+            diseaseModalOverlay.classList.add('opacity-0');
+            diseaseModal.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                diseaseModalOverlay.classList.add('hidden');
+                diseaseModal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function askAI() {
+            const question = aiQuestionInput.value;
+            if (!question.trim()) return;
+            aiAnswerContainer.innerHTML = `<div class="flex items-center text-slate-600"><div class="loader loader-dark mr-3"></div>Thinking...</div>`;
+            const { country } = currentAnalysisData;
+            const disease = diseaseFilter.value;
+            const prompt = `You are a public health expert. A user is looking at disease trends for ${country}, focusing on ${disease}. They asked: "${question}". Based on public health knowledge, provide a helpful, concise answer in 2-3 sentences. If unrelated, politely decline. Do not use markdown.`;
+            const response = await callGeminiAPI(prompt);
+            aiAnswerContainer.innerHTML = `<p>${response.replace(/\n/g, '<br>')}</p>`;
+        }
+
+        const switchView = (viewName) => {
+            viewContainers.forEach(c => c.classList.add('hidden'));
+            document.getElementById(`${viewName}-view`).classList.remove('hidden');
+            
+            navLinks.forEach(l => {
+                const isHeaderLink = l.closest('header');
+                if (isHeaderLink) {
+                    l.classList.toggle('active', l.dataset.view === viewName);
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        analyzeBtn.addEventListener('click', runAnalysis);
+        diseaseFilter.addEventListener('change', updateChartForFilter);
+        navLinks.forEach(l => l.addEventListener('click', e => { e.preventDefault(); switchView(l.dataset.view); }));
+        askAiBtn.addEventListener('click', askAI);
+        mainAdvisoryBtn.addEventListener('click', showModal);
+        closeModalBtn.addEventListener('click', hideModal);
+        diseaseModalOverlay.addEventListener('click', hideModal);
+        
+        switchView('home');
+    });
+    </script>
+</body>
+</html>
